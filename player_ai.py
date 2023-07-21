@@ -104,8 +104,13 @@ class PlayerAi:
                 # build_jet() returns the uid of the jet that was built
                 jet_uid = base.build_jet(heading=360 * np.random.random())
 
+        bases = myinfo["bases"]
+        center_x = sum([base.x for base in bases])/float(len(bases))
+        center_y = sum([base.y for base in bases])/float(len(bases))
+
         # Try to find an enemy target
         target = None
+        targets = []
         # If there are multiple teams in the info, find the first team that is not mine
         if len(info) > 1:
             for name in info:
@@ -113,8 +118,12 @@ class PlayerAi:
                     # Target only bases
                     if "bases" in info[name]:
                         # Simply target the first base
-                        t = info[name]["bases"][0]
-                        target = [t.x, t.y]
+                        enemybases = info[name]["bases"]
+                        for b in enemybases:
+                            targets.append([(b.x-center_x)**2 + (b.y-center_y)**2, b.x, b.y])
+            if len(targets) != 0:
+                targets.sort()
+                target = [targets[0][1], targets[0][2]]
 
         # Controlling my vehicles ==============================================
 
