@@ -3,7 +3,7 @@
 import numpy as np
 
 # This is your team name
-CREATOR = "TeamName"
+CREATOR = "Siyu"
 
 
 # This is the AI bot that will be instantiated for the competition
@@ -14,7 +14,7 @@ class PlayerAi:
         # Record the previous positions of all my vehicles
         self.previous_positions = {}
         # Record the number of tanks and ships I have at each base
-        self.ntanks = {}
+        self.njets = {}
         self.nships = {}
 
     def run(self, t: float, dt: float, info: dict, game_map: np.ndarray):
@@ -81,22 +81,20 @@ class PlayerAi:
         # Iterate through all my bases (vehicles belong to bases)
         for base in myinfo["bases"]:
             # If this is a new base, initialize the tank & ship counters
-            if base.uid not in self.ntanks:
-                self.ntanks[base.uid] = 0
+            if base.uid not in self.njets:
+                self.njets[base.uid] = 0
             if base.uid not in self.nships:
                 self.nships[base.uid] = 0
             # Firstly, each base should build a mine if it has less than 3 mines
             if base.mines < 3:
                 if base.crystal > base.cost("mine"):
                     base.build_mine()
-            # Secondly, each base should build a tank if it has less than 5 tanks
-            elif base.crystal > base.cost("tank") and self.ntanks[base.uid] < 5:
-                # build_tank() returns the uid of the tank that was built
-                tank_uid = base.build_tank(heading=360 * np.random.random())
-                # Add 1 to the tank counter for this base
-                self.ntanks[base.uid] += 1
-            # Thirdly, each base should build a ship if it has less than 3 ships
-            elif base.crystal > base.cost("ship") and self.nships[base.uid] < 3:
+            # Secondly, each base should build a jet if it has less than 3 jets
+            elif self.njets[base.uid] < 3 and base.crystal > base.cost("jet"):
+                base.build_jet(heading=360 * np.random.random())
+                self.njets[base.uid] += 1
+            # Thirdly, each base should build a ship if it has less than 5 ships
+            elif base.crystal > base.cost("ship") and self.nships[base.uid] < 5:
                 # build_ship() returns the uid of the ship that was built
                 ship_uid = base.build_ship(heading=360 * np.random.random())
                 # Add 1 to the ship counter for this base
